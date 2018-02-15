@@ -57,6 +57,8 @@ public class Converter
 			{
 				double converterInput = Double.parseDouble(userSelection);
 				System.out.println("IEEE754:\n" + (DectoIEEE_SP(converterInput)));
+				System.out.println("Enter any key to exit.");
+				userSelection = userInput.next();
 			}
 			else
 			{
@@ -70,6 +72,8 @@ public class Converter
 			{
 				double converterInput = Double.parseDouble(userSelection);
 				System.out.println("IEEE754:\n" + (DectoIEEE_DP(converterInput)));
+				System.out.println("Enter any key to exit.");
+				userSelection = userInput.next();
 			}
 			else
 			{
@@ -82,6 +86,8 @@ public class Converter
 			if(CheckInput(userSelection, 3))
 			{
 				System.out.println("Decimal:\n" + (IEEESingletoDec(userSelection)));
+				System.out.println("Enter any key to exit.");
+				userSelection = userInput.next();
 			}
 			else
 			{
@@ -94,6 +100,8 @@ public class Converter
 			if(CheckInput(userSelection, 4))
 			{
 				System.out.println("Decimal:\n" + (IEEEDoubletoDec(userSelection)));
+				System.out.println("Enter any key to exit.");
+				userSelection = userInput.next();
 			}
 			else
 			{
