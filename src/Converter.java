@@ -40,8 +40,108 @@ public class Converter
 		//System.out.println(DectoIEEE_SP(555));
 		//System.out.println(DectoIEEE_DP(0));
 		//System.out.println(SPtoDecimalSignificance("00010101100000000000000"));
-		System.out.println(IEEESingletoDec("01000000010110011001100110011010"));
-		System.out.println(IEEEDoubletoDec("0100000000110111000000000000000000000000000000000000000000000000"));
+		//System.out.println(IEEESingletoDec("01000000010110011001100110011010"));
+		//System.out.println(IEEEDoubletoDec("0100000000110111000000000000000000000000000000000000000000000000"));
+		System.out.println("This is an IEEE754 converter, please select an option:");
+		System.out.println("1. Decimal to Single Precision IEEE754");
+		System.out.println("2. Decimal to Double Precision IEEE754");
+		System.out.println("3. Single Precision IEEE754 to Decimal");
+		System.out.println("4. Double Precision IEEE754 to Decimal");
+		Scanner userInput = new Scanner(System.in);
+		String userSelection = userInput.next();
+		switch (userSelection) {
+		case "1": //Decimal To SPIEEE
+			System.out.println("Enter the Decimal number you wish to convert.");
+			userSelection = userInput.next();
+			if(CheckInput(userSelection, 1))
+			{
+				double converterInput = Double.parseDouble(userSelection);
+				System.out.println("IEEE754:\n" + (DectoIEEE_SP(converterInput)));
+			}
+			else
+			{
+				System.out.println("Invalid Input!");
+			}
+			break;
+		case "2": //Decimal to DPIEEE
+			System.out.println("Enter the Decimal number you wish to convert.");
+			userSelection = userInput.next();
+			if(CheckInput(userSelection, 2))
+			{
+				double converterInput = Double.parseDouble(userSelection);
+				System.out.println("IEEE754:\n" + (DectoIEEE_DP(converterInput)));
+			}
+			else
+			{
+				System.out.println("Invalid Input!");
+			}
+			break;
+		case "3": //SPIEEE to Decimal
+			System.out.println("Enter the IEEE representation you wish to convert.");
+			userSelection = userInput.next();
+			if(CheckInput(userSelection, 3))
+			{
+				System.out.println("Decimal:\n" + (IEEESingletoDec(userSelection)));
+			}
+			else
+			{
+				System.out.println("Invalid Input!");
+			}
+			break;
+		case "4": //DPIEEE to Decimal
+			System.out.println("Enter the IEEE representation you wish to convert.");
+			userSelection = userInput.next();
+			if(CheckInput(userSelection, 4))
+			{
+				System.out.println("Decimal:\n" + (IEEEDoubletoDec(userSelection)));
+			}
+			else
+			{
+				System.out.println("Invalid Input!");
+			}
+			break;
+		default:
+			break;
+		}
+		
+	}
+	
+	public static boolean CheckInput(String input, int mode)
+	{
+		if(mode == 1 || mode == 2) {
+			if(input.matches("^[-+]?\\d+(\\.\\d+)?$"))
+			{
+				return true;
+			}
+			
+		}
+		else if(mode == 3)
+		{
+			if(input.length()!=32)
+			{
+				return false;
+			}
+			else if(input.matches("[01]+"))
+			{
+				return true;
+			}
+		}
+		else if(mode == 4)
+		{
+			if(input.length()!=64)
+			{
+				return false;
+			}
+			else if(input.matches("[01]+"))
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
+		return false;
 	}
 	
 	public static String findBinaryAfterRadix(double input, int mantissaBits)
@@ -54,6 +154,7 @@ public class Converter
 		double workingDouble = doubleToConvert;
 		for(int i = 0; i<mantissaBits; i++)
 		{
+			//System.out.println(workingDouble);
 			if(workingDouble>1)
 			{
 				workingDouble = workingDouble-1;
@@ -62,7 +163,7 @@ public class Converter
 			if(workingDouble==1)
 			{
 				returnString = returnString + "1";
-				i =24;
+				i =99;
 			}
 			else if(workingDouble>1)
 			{
@@ -73,15 +174,18 @@ public class Converter
 				returnString = returnString + "0";
 			}
 		}
+		//System.out.println(returnString);
 		return returnString;
 	}
 	
 	public static String findBinaryBeforeRadix(double input)
 	{
-		int inputInt = (int)input;
+		int inputInt = Math.abs((int)input);
+		//System.out.println(inputInt);
 		String inputString = Double.toString(input);
 		String binary = "";
-		binary = binary + Integer.toBinaryString(inputInt);
+		binary = Integer.toBinaryString(inputInt);
+		//System.out.println(binary);
 		return binary;
 	}
 	
@@ -96,13 +200,27 @@ public class Converter
 		
 		//Normalize
 		int radixIndex = toNormalize.indexOf('.');
+		//System.out.println(radixIndex);
 		power =  radixIndex -1;
-		
+		if (toNormalize.contains("0."))
+		{
+			//System.out.println("test");
+			power = -(toNormalize.indexOf("1")-1);
+		}
+		//System.out.println(power);
 		excess = power + 127;
+		//System.out.println(excess);
+		
+		//System.out.println(toNormalize);
 		
 		toNormalize = toNormalize.replace(".", "");
-		String normalized = toNormalize.substring(0,1) + "." + toNormalize.substring(1,toNormalize.length());
-		
+		//String normalized = toNormalize.substring(0,1) + "." + toNormalize.substring(1,toNormalize.length());
+		String normalized = "1" + "." + toNormalize.substring(toNormalize.indexOf("1")+1, toNormalize.length());
+		if(normalized.contains("0."))
+		{
+			//System.out.println(normalized);
+			normalized = normalized.substring(normalized.indexOf("1"),normalized.length());
+		}
 		//System.out.println(excess);
 		
 		//System.out.println(normalized);
@@ -118,9 +236,38 @@ public class Converter
 			returnString = returnString + "1";
 		}
 		
-		returnString = returnString + Integer.toBinaryString(excess); //Add Exponent
-		returnString = returnString + normalized.substring(2,normalized.length()); //Add Mantissa
+		String expString = Integer.toBinaryString(excess);
+
 		
+		if(expString.length()<8)
+		{
+			for(int i = expString.length(); i<8; i++)
+			{
+				expString = "0"+ expString;
+			}
+		}
+		//System.out.println(expString);
+		
+		returnString = returnString + expString; //Add Exponent
+		if(normalized.length()==1)
+		{
+			returnString = returnString + "1";
+		}
+		else
+		{
+			returnString = returnString + normalized.substring(2,normalized.length()); //Add Mantissa
+		}		
+		if(returnString.length()<32)
+		{
+			for(int i=returnString.length();i<=32;i++)
+			{
+				returnString = returnString + "0";
+			}
+		}
+		if(returnString.length()>32)
+		{
+			returnString = returnString.substring(0,32);
+		}
 		return returnString;
 		
 	}
@@ -136,13 +283,27 @@ public class Converter
 		
 		//Normalize
 		int radixIndex = toNormalize.indexOf('.');
+		//System.out.println(radixIndex);
 		power =  radixIndex -1;
-		
+		if (toNormalize.contains("0."))
+		{
+			//System.out.println("test");
+			power = -(toNormalize.indexOf("1")-1);
+		}
+		//System.out.println(power);
 		excess = power + 1023;
+		//System.out.println(excess);
+		
+		//System.out.println(toNormalize);
 		
 		toNormalize = toNormalize.replace(".", "");
-		String normalized = toNormalize.substring(0,1) + "." + toNormalize.substring(1,toNormalize.length());
-		
+		//String normalized = toNormalize.substring(0,1) + "." + toNormalize.substring(1,toNormalize.length());
+		String normalized = "1" + "." + toNormalize.substring(toNormalize.indexOf("1")+1, toNormalize.length());
+		if(normalized.contains("0."))
+		{
+			//System.out.println(normalized);
+			normalized = normalized.substring(normalized.indexOf("1"),normalized.length());
+		}
 		//System.out.println(excess);
 		
 		//System.out.println(normalized);
@@ -158,9 +319,38 @@ public class Converter
 			returnString = returnString + "1";
 		}
 		
-		returnString = returnString + Integer.toBinaryString(excess); //Add Exponent
-		returnString = returnString + normalized.substring(2,normalized.length()); //Add Mantissa
+		String expString = Integer.toBinaryString(excess);
+
 		
+		if(expString.length()<11)
+		{
+			for(int i = expString.length(); i<11; i++)
+			{
+				expString = "0"+ expString;
+			}
+		}
+		//System.out.println(expString);
+		
+		returnString = returnString + expString; //Add Exponent
+		if(normalized.length()==1)
+		{
+			returnString = returnString + "1";
+		}
+		else
+		{
+			returnString = returnString + normalized.substring(2,normalized.length()); //Add Mantissa
+		}		
+		if(returnString.length()<64)
+		{
+			for(int i=returnString.length();i<=64;i++)
+			{
+				returnString = returnString + "0";
+			}
+		}
+		if(returnString.length()>64)
+		{
+			returnString = returnString.substring(0,64);
+		}
 		return returnString;
 	}
 	public static double IEEESingletoDec(String IEEE) //Single
